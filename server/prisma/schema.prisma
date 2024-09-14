@@ -14,6 +14,7 @@ model User {
   username   String
   password   String
   isPremium  Boolean   @default(false) // Premium user status
+  profilePicture String? //optional field for profile picture
   groups     Group[]   @relation("group_members")  // Groups user is a member of
   createdGroups Group[] @relation("group_creator") // Groups user has created
   streams    Stream[]  @relation("user_streams")   // Streams user has created
