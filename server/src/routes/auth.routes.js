@@ -12,5 +12,7 @@ const router = Router();
 
 //router for registering a new user
 router.post('/register', registerUser)
+router.post('/login', loginUser);
+router.post('/logout', logoutUser);
 
 export default router;

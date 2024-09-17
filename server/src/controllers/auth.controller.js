@@ -50,9 +50,48 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-    
+    // Extract data from request
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+        throw new ApiError(400, "Email and Password are required");
+    }
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+        where: { email },
+    });
+
+    if (!user) {
+        throw new ApiError(401, "Invalid credentials");
+    }
+
+    // Check if password matches
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Invalid credentials");
+    }
+
+    // Create JWT token
+    const accessToken = jwt.sign(
+        { id: user.id, email: user.email, isPremium: user.isPremium },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '1h' } // Token expires in 1 hour
+    );
+
+    // Exclude the password before sending back the response
+    const userResponse = { ...user, password: undefined };
+
+    // Set the token in the response cookie (optional) and send back response
+    res.cookie('accessToken', accessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.status(200).json(new ApiResponse(200, userResponse, "Login successful"));
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-    
+    // Clear the access token from the cookies
+    res.clearCookie('accessToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+
+    // Send success response
+    res.status(200).json(new ApiResponse(200, null, "Logout successful"));
 });
