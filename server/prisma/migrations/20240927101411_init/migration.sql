@@ -8,8 +8,10 @@ CREATE TABLE "User" (
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "isPremium" BOOLEAN NOT NULL DEFAULT false,
+    "profilePicture" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "refreshToken" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );

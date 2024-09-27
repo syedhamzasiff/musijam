@@ -16,14 +16,21 @@ const generateRefreshToken = (userId) => {
 
 export const generateAccessAndRefreshTokens = async (userId) => {
     try {
+        console.log("Generating tokens for user ID:", userId);
+
         // Find the user in the database using Prisma
         const user = await prisma.user.findUnique({
             where: { id: userId }
         });
 
         if (!user) {
+            console.log("User not found for ID:", userId);
             throw new ApiError(404, "User not found");
         }
+
+        // Log the secrets
+        console.log("Access Token Secret:", process.env.ACCESS_TOKEN_SECRET);
+        console.log("Refresh Token Secret:", process.env.REFRESH_TOKEN_SECRET);
 
         // Generate access and refresh tokens
         const accessToken = generateAccessToken(user.id);
@@ -37,10 +44,11 @@ export const generateAccessAndRefreshTokens = async (userId) => {
 
         return { accessToken, refreshToken };
     } catch (error) {
-        console.error(error);
+        console.error("Error generating tokens:", error); // Log the entire error object
         throw new ApiError(500, "Something went wrong while generating refresh and access tokens");
     }
 };
+
 
 export const registerUser = asyncHandler(async (req, res) => {
     //extract data

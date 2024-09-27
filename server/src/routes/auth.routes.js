@@ -1,19 +1,40 @@
-import { Router } from 'express'
+import express from 'express';
 import {
+    registerUser,
     loginUser,
     logoutUser,
-    registerUser
-} from "../controllers/auth.controller.js"
-import { upload } from "../middlewares/multer.middleware.js"
-import { verifyJWT } from "../middlewares/auth.middleware.js" 
+    getCurrentUser,
+    updateUserProfile,
+    changePassword,
+    forgotPassword,
+    deleteUserAccount
+} from '../controllers/auth.controller.js';  // Assuming your file is named `auth.controller.js`
+import { verifyJWT } from '../middlewares/auth.middleware.js';  // Middleware for JWT verification
 
+const router = express.Router();
 
-const router = Router();
+// User Registration Route
+router.route('/register').post(registerUser);
 
-//router for registering a new user
-router.post('/register', registerUser)
-router.post('/login', loginUser);
-router.route("/logout").post(verifyJWT, logoutUser);
+// User Login Route
+router.route('/login').post(loginUser);
 
+// User Logout Route (Requires authentication)
+router.route('/logout').post(verifyJWT, logoutUser);
+
+// Get Current User (Requires authentication)
+router.route('/me').get(verifyJWT, getCurrentUser);
+
+// Update User Profile (Requires authentication)
+router.route('/update-profile').put(verifyJWT, updateUserProfile);
+
+// Change Password (Requires authentication)
+router.route('/change-password').put(verifyJWT, changePassword);
+
+// Forgot Password Route (Publicly accessible)
+router.route('/forgot-password').post(forgotPassword);
+
+// Delete User Account (Requires authentication)
+router.route('/delete-account').delete(verifyJWT, deleteUserAccount);
 
 export default router;

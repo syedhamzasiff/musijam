@@ -21,6 +21,7 @@ model User {
   upvotes    Upvote[]  // Upvotes user has given to streams
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+  refreshToken    String?
 }
 
 // Group Model
