@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom"; // Changed import from next/link to react-router-dom
+import { Link, useNavigate } from "react-router-dom"; 
+import { registerUser } from '@/api/auth'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,16 +10,22 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log("Registration attempt", { email, username, password });
+    try {
+      const result = await registerUser({ email, username, password });
+      console.log("User registered successfully:", result);
+      navigate("/login"); 
+    } catch (error) {
+      console.error("Registration failed", error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-100 to-white flex flex-col justify-center items-center px-4">
-      <Link to="/" className="text-3xl font-bold text-indigo-600 mb-8"> {/* Updated Link component usage */}
+      <Link to="/" className="text-3xl font-bold text-indigo-600 mb-8"> 
         Musijam
       </Link>
       <Card className="w-full max-w-md">
@@ -68,7 +75,7 @@ export default function RegisterPage() {
         <CardFooter>
           <p className="text-center w-full text-sm text-gray-600">
             Already have an account?{" "}
-            <Link to="/login" className="text-indigo-600 hover:underline"> {/* Updated Link component usage */}
+            <Link to="/login" className="text-indigo-600 hover:underline"> 
               Log in
             </Link>
           </p>

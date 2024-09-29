@@ -16,8 +16,7 @@ const generateRefreshToken = (userId) => {
 
 export const generateAccessAndRefreshTokens = async (userId) => {
     try {
-        console.log("Generating tokens for user ID:", userId);
-
+        
         // Find the user in the database using Prisma
         const user = await prisma.user.findUnique({
             where: { id: userId }
@@ -29,8 +28,8 @@ export const generateAccessAndRefreshTokens = async (userId) => {
         }
 
         // Log the secrets
-        console.log("Access Token Secret:", process.env.ACCESS_TOKEN_SECRET);
-        console.log("Refresh Token Secret:", process.env.REFRESH_TOKEN_SECRET);
+        //console.log("Access Token Secret:", process.env.ACCESS_TOKEN_SECRET);
+        //console.log("Refresh Token Secret:", process.env.REFRESH_TOKEN_SECRET);
 
         // Generate access and refresh tokens
         const accessToken = generateAccessToken(user.id);
@@ -97,19 +96,20 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-    const { email, username, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
     // Validate input
-    if (!username && !email) {
+    if (!emailOrUsername) {
         throw new ApiError(400, "Username or email is required");
     }
 
-    // Find the user by username or email using Prisma
+    // Determine if the input is an email or username
+    const isEmail = emailOrUsername.includes('@'); // Simple check for email format
     const user = await prisma.user.findFirst({
         where: {
             OR: [
-                { email },
-                { username }
+                { email: isEmail ? emailOrUsername : undefined },
+                { username: isEmail ? undefined : emailOrUsername }
             ]
         }
     });
@@ -159,6 +159,7 @@ export const loginUser = asyncHandler(async (req, res) => {
             )
         );
 });
+
 
 export const logoutUser = asyncHandler(async (req, res) => {
     // Update the user in the database, removing the refreshToken field
